@@ -1,13 +1,14 @@
 <template>
-  <nav class="main_nav">
-    <ul>
+  <nav class="AppNav">
+    <ul class="AppNav_list">
       <li
+        class="AppNav_item"
         v-for="item in menuItems"
         :key="item.name"
       >
         <router-link
           :to="'/' + item.path"
-          class="block p-2"
+          class="AppNav_link mb-2 block"
         >
           {{ item.meta.label }}
         </router-link>
