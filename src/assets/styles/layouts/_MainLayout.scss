@@ -1,0 +1,15 @@
+.MainLayout {
+  &_aside {
+    background-color: $AccentColor2;
+    border-right: $AppBorder;
+  }
+  &_header {
+    background-color: $AccentColor2;
+    border-bottom: $AppBorder;
+  }
+  &_footer {
+    background-color: $AccentColor2;
+    border-top: $AppBorder;
+  }
+
+}

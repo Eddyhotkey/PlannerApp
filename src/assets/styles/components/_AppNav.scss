@@ -1,0 +1,21 @@
+.AppNav {
+  &_list {
+
+  }
+  &_item {
+
+  }
+  &_link {
+    padding: 0.625rem 1.25rem;
+    text-decoration: none;
+    background-color: $AccentColor1;
+    border: 0.1875rem solid $BorderColor;
+    color: $AppTextColor;
+    text-transform: uppercase;
+    transition-duration: 0.3s;
+    &:hover {
+      background-color: $AccentColor5;
+      color: #f0f4ff;
+    }
+  }
+}
