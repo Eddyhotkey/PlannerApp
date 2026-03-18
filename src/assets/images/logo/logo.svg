@@ -1,9 +1,10 @@
 <svg width="220" height="64" viewBox="0 0 220 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Planner Logo">
-    <rect x="4" y="8" width="48" height="48" rx="12" fill="#4F46E5"/>
+    <rect x="4" y="8" width="48" height="48" rx="12" fill="#A65E82"/>
     <rect x="12" y="18" width="32" height="26" rx="6" fill="white"/>
-    <rect x="12" y="18" width="32" height="8" rx="6" fill="#C7D2FE"/>
+    <rect x="12" y="18" width="32" height="8" rx="6" fill="#d0a7b9"/>
     <rect x="18" y="12" width="4" height="10" rx="2" fill="white"/>
     <rect x="34" y="12" width="4" height="10" rx="2" fill="white"/>
-    <path d="M19 36L24 41L36 30" stroke="#4F46E5" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
-    <text x="64" y="40" fill="#111827" font-size="26" font-family="Arial, Helvetica, sans-serif" font-weight="700">Planner</text>
+    <path d="M19 36L24 41L36 30" stroke="#2b3136" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="64" y="40" fill="#2b3136" font-size="26" font-family="Arial, Helvetica, sans-serif" font-weight="300">
+        Planner</text>
 </svg>
