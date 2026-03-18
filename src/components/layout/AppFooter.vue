@@ -2,10 +2,8 @@
   <h1>AppFooter</h1>
 </template>
 
-<script>
-export default {
-  name: "AppFooter",
-}
+<script setup >
+
 </script>
 
 <style scoped>
