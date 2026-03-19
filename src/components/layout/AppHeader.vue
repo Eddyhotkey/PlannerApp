@@ -1,5 +1,5 @@
 <template>
-  <div class="AppHeader flex align-middle justify-between">
+  <div class="AppHeader flex items-center justify-between">
     <DayNavigator />
     <PeriodNavigator />
   </div>

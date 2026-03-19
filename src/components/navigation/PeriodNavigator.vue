@@ -2,17 +2,18 @@
   <div class="AppHeader_wmy">
     <div class="inline-flex rounded-base" role="group">
       <button type="button"
-              class="cursor-pointer text-body bg-neutral-primary-soft border border-default hover:bg-neutral-secondary-medium hover:text-heading focus:ring-4 focus:ring-neutral-tertiary-soft shadow-xs font-medium leading-5 rounded-base text-sm px-4 py-2.5 focus:outline-none"
+              class="text-white bg-indigo-400  hover:bg-indigo-500 hover:text-white focus:bg-indigo-500 font-medium shadow-xl/10 leading-5 text-xl px-5 py-2 focus:outline-none rounded-base m-3 cursor-pointer"
       >
         W 12
       </button>
       <button type="button"
-              class="cursor-pointer mx-1 text-body bg-neutral-primary-soft border border-default hover:bg-neutral-secondary-medium hover:text-heading focus:ring-4 focus:ring-neutral-tertiary-soft shadow-xs font-medium leading-5 rounded-base text-sm px-4 py-2.5 focus:outline-none"
+              class="text-white bg-indigo-400  hover:bg-indigo-500 hover:text-white focus:bg-indigo-500 font-medium shadow-xl/10 leading-5 text-xl px-5 py-2 focus:outline-none rounded-base m-3 cursor-pointer"
+
       >
         März
       </button>
       <button type="button"
-              class="cursor-pointer text-body bg-neutral-primary-soft border border-default hover:bg-neutral-secondary-medium hover:text-heading focus:ring-4 focus:ring-neutral-tertiary-soft shadow-xs font-medium leading-5 rounded-base text-sm px-4 py-2.5 focus:outline-none"
+              class="text-white bg-indigo-400  hover:bg-indigo-500 hover:text-white focus:bg-indigo-500 font-medium shadow-xl/10 leading-5 text-xl px-5 py-2 focus:outline-none rounded-base m-3 cursor-pointer"
       >
         2026
       </button>
