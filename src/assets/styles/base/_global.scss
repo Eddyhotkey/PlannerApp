@@ -1,5 +1,4 @@
 body {
   background-color: $AppBackground;
   color: $AppTextColor;
-  font-size: clamp(1rem, 0.8rem + 0.7vw, 1.5rem); /* min 16px, max 24px */
 }
