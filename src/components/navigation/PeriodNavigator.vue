@@ -1,26 +1,36 @@
 <template>
   <div class="AppHeader_wmy">
-    <div class="inline-flex rounded-base" role="group">
-      <button type="button"
-              class="text-white bg-indigo-400  hover:bg-indigo-500 hover:text-white focus:bg-indigo-500 font-medium shadow-xl/10 leading-5 text-xl px-5 py-2 focus:outline-none rounded-base m-3 cursor-pointer"
+    <nav class="inline-flex gap-3" aria-label="Zeitraum-Navigation">
+      <router-link
+        to="/week"
+        class="text-white shadow-xl/20 bg-indigo-400 hover:bg-indigo-500 px-5 py-2 rounded-base"
+        active-class="bg-indigo-500"
       >
-        W 12
-      </button>
-      <button type="button"
-              class="text-white bg-indigo-400  hover:bg-indigo-500 hover:text-white focus:bg-indigo-500 font-medium shadow-xl/10 leading-5 text-xl px-5 py-2 focus:outline-none rounded-base m-3 cursor-pointer"
+        KW {{ dateStore.currentWeek }}
+      </router-link>
 
+      <router-link
+        to="/month"
+        class="block text-white shadow-xl/20 bg-indigo-400 hover:bg-indigo-500 px-5 py-2 rounded-base"
+        active-class="bg-indigo-500"
       >
-        März
-      </button>
-      <button type="button"
-              class="text-white bg-indigo-400  hover:bg-indigo-500 hover:text-white focus:bg-indigo-500 font-medium shadow-xl/10 leading-5 text-xl px-5 py-2 focus:outline-none rounded-base m-3 cursor-pointer"
+        {{ dateStore.currentMonth }}
+      </router-link>
+
+      <router-link
+        to="/year"
+        class="text-white shadow-xl/20 bg-indigo-400 hover:bg-indigo-500 px-5 py-2 rounded-base"
+        active-class="bg-indigo-500"
       >
-        2026
-      </button>
-    </div>
+        {{ dateStore.currentYear}}
+      </router-link>
+    </nav>
   </div>
 </template>
 <script setup>
+
+  import { useDateStore } from "@/stores/dateStore.js";
+  const dateStore = useDateStore();
 
 </script>
 <style scoped>

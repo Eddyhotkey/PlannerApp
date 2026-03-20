@@ -8,7 +8,8 @@
       >
         <router-link
           :to="'/' + item.path"
-          class="flex items-center justify-between text-xl cursor-pointer text-white bg-indigo-400 hover:bg-indigo-500 hover:text-white focus:ring-1 focus:ring-indigo-100 shadow-xl/20 font-300 leading-5 rounded-base  px-5 py-4 focus:outline-none mb-4 focus:bg-indigo-500"
+          class="flex items-center justify-between text-xl cursor-pointer text-white bg-indigo-400 hover:bg-indigo-500 hover:text-white shadow-xl/20 font-300 leading-5 rounded-base  px-5 py-4 focus:outline-none mb-4 focus:bg-indigo-500"
+          active-class="bg-indigo-500"
         >
           {{ item.meta.label }} <IconArrowRight/>
         </router-link>
