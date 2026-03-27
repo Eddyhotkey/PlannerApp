@@ -89,6 +89,7 @@ const emit = defineEmits([
   'update-priority',
   'drag-start',
   'drop-task',
+  'remove-task',
 ])
 
 const isEditing = ref(false)
