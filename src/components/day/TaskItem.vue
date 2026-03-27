@@ -1,9 +1,13 @@
 <template>
   <li
-    class="flex items-center gap-3 rounded-lg bg-white p-3 shadow-sm"
+    :class="[
+      'flex items-center gap-3 rounded-lg bg-white p-3 shadow-sm transition',
+      isDropTarget ? 'ring-2 ring-blue-400 bg-blue-50' : ''
+    ]"
     draggable="true"
     @dragstart="$emit('drag-start', task)"
-    @dragover.prevent
+    @dragover.prevent = "$emit( 'drag-over-task', task )"
+    @dragleave = "$emit( 'drag-leave-task', task )"
     @drop="$emit('drop-task', task)"
   >
     <input
@@ -93,6 +97,10 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  isDropTarget: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const emit = defineEmits([
@@ -103,6 +111,8 @@ const emit = defineEmits([
   'drag-start',
   'drop-task',
   'remove-task',
+  'drag-over-task',
+  'drag-leave-task',
 ])
 
 const isEditing = ref(false)

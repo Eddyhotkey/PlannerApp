@@ -33,13 +33,16 @@
         v-for="task in tasks"
         :key="task.id"
         :task="task"
+        :is-drop-target="dropTargetTaskId === task.id"
         @remove-task="$emit( 'remove-task', $event )"
         @toggle-completed="$emit('toggle-completed', $event)"
         @move-to-tomorrow="$emit('move-to-tomorrow', $event)"
         @update-title="$emit('update-title', $event)"
         @update-priority="$emit('update-priority', $event)"
-        @drag-start="$emit('drag-start', $event)"
-        @drop-task="$emit('drop-task', $event)"
+        @drag-start="handleTaskDragStart"
+        @drag-over-task="handleTaskDragOver"
+        @drag-leave-task="handleTaskDragLeave"
+        @drop-task="handleTaskDrop"
       />
     </ul>
   </section>
@@ -74,6 +77,7 @@ const emit = defineEmits([
 ])
 
 const isDragOver = ref(false);
+const dropTargetTaskId = ref( null );
 
 function handleDragEnter( ) {
   isDragOver.value = true;
@@ -97,5 +101,23 @@ function handleDropCategory( ) {
   emit( 'drop-category' );
 }
 
+function handleTaskDragStart ( task ) {
+  emit( 'drag-start', task );
+}
+
+function handleTaskDragOver ( task ) {
+  isDragOver.value = true;
+  dropTargetTaskId.value = task.id;
+}
+
+function handleTaskDragLeave ( ) {
+  dropTargetTaskId.value =null;
+}
+
+function handleTaskDrop( task ) {
+  isDragOver.value = false;
+  dropTargetTaskId.value = null;
+  emit( 'drop-task', task)
+}
 
 </script>
