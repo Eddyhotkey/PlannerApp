@@ -65,7 +65,7 @@
     <button
       v-if="!isEditing"
       type="button"
-      class="rounded-md px-2 py-1 text-xs text-slate-500 hover:bg-slate-100"
+      class="rounded-md px-2 py-1 text-xs text-slate-500 hover:bg-slate-100 cursor-pointer"
       @click="startEdit"
     >
       <IconEdit />
