@@ -68,7 +68,7 @@
       class="rounded-md px-2 py-1 text-xs text-slate-500 hover:bg-slate-100"
       @click="startEdit"
     >
-      Bearbeiten
+      <IconEdit />
     </button>
 
     <button
