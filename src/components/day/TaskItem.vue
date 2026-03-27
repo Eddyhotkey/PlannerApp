@@ -73,7 +73,9 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
+import IconEdit from "@/components/icons/IconEdit.vue";
+import IconTrash from "@/components/icons/IconTrash.vue";
 
 const props = defineProps({
   task: {
