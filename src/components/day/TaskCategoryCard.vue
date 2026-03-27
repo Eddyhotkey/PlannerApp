@@ -17,6 +17,7 @@
         v-for="task in tasks"
         :key="task.id"
         :task="task"
+        @remove-task="$emit( 'remove-task', $event )"
         @toggle-completed="$emit('toggle-completed', $event)"
         @move-to-tomorrow="$emit('move-to-tomorrow', $event)"
         @update-title="$emit('update-title', $event)"
@@ -44,6 +45,7 @@ defineProps({
 
 defineEmits([
   'add-task',
+  'remove-task',
   'toggle-completed',
   'move-to-tomorrow',
   'update-title',
