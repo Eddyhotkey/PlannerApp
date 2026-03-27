@@ -101,6 +101,16 @@ watch(
   }
 )
 
+watch(
+  () => props.task.isNew,
+  (isNew) => {
+    if (isNew) {
+      startEdit()
+    }
+  },
+  { immediate: true }
+)
+
 const priorityLabel = computed(() => {
   if (props.task.priority === 'high') return 'Hoch'
   if (props.task.priority === 'low') return 'Niedrig'
