@@ -16,6 +16,7 @@
     <div class="flex-1">
       <template v-if="isEditing">
         <input
+          ref="titleInput"
           v-model="localTitle"
           type="text"
           class="w-full rounded-md border border-slate-300 px-2 py-1 text-sm"
