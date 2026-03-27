@@ -107,6 +107,7 @@ const emit = defineEmits([
 
 const isEditing = ref(false)
 const localTitle = ref(props.task.title)
+const titleInput = ref(null)
 
 watch(
   () => props.task.title,
