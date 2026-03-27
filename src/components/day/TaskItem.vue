@@ -72,7 +72,7 @@
     </button>
 
     <button
-      v-if="!task.completed && !isEditing"
+      v-if="!isEditing"
       type="button"
       class="rounded-md px-2 py-1 text-xs text-red-600 hover:bg-red-50 cursor-pointer"
       @click="removeTask"
