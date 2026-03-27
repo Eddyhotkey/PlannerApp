@@ -10,8 +10,9 @@
         @move-to-tomorrow="task => moveTaskToTomorrow(task, 'arbeitTasks')"
         @update-title="payload => updateTaskTitle(payload, 'arbeitTasks')"
         @update-priority="payload => updateTaskPriority(payload, 'arbeitTasks')"
-        @drag-start="handleDragStart"
+        @drag-start="task => handleDragStart(task, 'arbeitTasks')"
         @drop-task="task => handleDrop(task, 'arbeitTasks')"
+        @drop-category="handleCategoryDrop('arbeitTasks')"
       />
 
       <TaskCategoryCard
@@ -23,8 +24,9 @@
         @move-to-tomorrow="task => moveTaskToTomorrow(task, 'familieTasks')"
         @update-title="payload => updateTaskTitle(payload, 'familieTasks')"
         @update-priority="payload => updateTaskPriority(payload, 'familieTasks')"
-        @drag-start="handleDragStart"
+        @drag-start="task => handleDragStart(task, 'familieTasks')"
         @drop-task="task => handleDrop(task, 'familieTasks')"
+        @drop-category="handleCategoryDrop('familieTasks')"
       />
 
       <TaskCategoryCard
@@ -36,10 +38,10 @@
         @move-to-tomorrow="task => moveTaskToTomorrow(task, 'persoenlichTasks')"
         @update-title="payload => updateTaskTitle(payload, 'persoenlichTasks')"
         @update-priority="payload => updateTaskPriority(payload, 'persoenlichTasks')"
-        @drag-start="handleDragStart"
+        @drag-start="task => handleDragStart(task, 'persoenlichTasks')"
         @drop-task="task => handleDrop(task, 'persoenlichTasks')"
+        @drop-category="handleCategoryDrop('persoenlichTasks')"
       />
-
     </div>
 
     <AppointmentSection :appointments="appointments" />
@@ -60,7 +62,8 @@ export default {
 
   data() {
     return {
-      draggedTaskId: null,
+      draggedTask: null,
+      draggedFromList: null,
 
       arbeitTasks: [
         { id: 1, title: 'Kunden anrufen', completed: false, priority: 'high' },
@@ -82,7 +85,6 @@ export default {
   },
 
   methods: {
-
     addTask(listName) {
       const newTask = {
         id: Date.now(),
@@ -95,12 +97,13 @@ export default {
       this[listName].push(newTask)
     },
 
-    removeTask( task, listName ) {
-      this[ listName ] = this[ listName ].filter( item => item.id !== task.id )
+    removeTask(task, listName) {
+      this[listName] = this[listName].filter(item => item.id !== task.id)
     },
 
     toggleTaskCompleted(task, listName) {
       const currentTask = this[listName].find(item => item.id === task.id)
+
       if (currentTask) {
         currentTask.completed = !currentTask.completed
       }
@@ -112,6 +115,7 @@ export default {
 
     updateTaskTitle(payload, listName) {
       const currentTask = this[listName].find(item => item.id === payload.id)
+
       if (currentTask) {
         currentTask.title = payload.title
         currentTask.isNew = false
@@ -120,27 +124,63 @@ export default {
 
     updateTaskPriority(payload, listName) {
       const currentTask = this[listName].find(item => item.id === payload.id)
+
       if (currentTask) {
         currentTask.priority = payload.priority
       }
     },
 
-    handleDragStart(task) {
-      this.draggedTaskId = task.id
+    handleDragStart(task, listName) {
+      this.draggedTask = task
+      this.draggedFromList = listName
     },
 
-    handleDrop(targetTask, listName) {
-      const list = [...this[listName]]
-      const fromIndex = list.findIndex(item => item.id === this.draggedTaskId)
-      const toIndex = list.findIndex(item => item.id === targetTask.id)
+    handleDrop(targetTask, targetListName) {
+      if (!this.draggedTask || !this.draggedFromList) return
 
-      if (fromIndex === -1 || toIndex === -1 || fromIndex === toIndex) return
+      const sourceList = [...this[this.draggedFromList]]
+      const targetList = [...this[targetListName]]
 
-      const [movedItem] = list.splice(fromIndex, 1)
-      list.splice(toIndex, 0, movedItem)
+      const sourceIndex = sourceList.findIndex(item => item.id === this.draggedTask.id)
+      const targetIndex = targetList.findIndex(item => item.id === targetTask.id)
 
-      this[listName] = list
-      this.draggedTaskId = null
+      if (sourceIndex === -1 || targetIndex === -1) return
+
+      if (this.draggedFromList === targetListName) {
+        const [movedItem] = targetList.splice(sourceIndex, 1)
+        targetList.splice(targetIndex, 0, movedItem)
+        this[targetListName] = targetList
+      } else {
+        const [movedItem] = sourceList.splice(sourceIndex, 1)
+        targetList.splice(targetIndex, 0, movedItem)
+
+        this[this.draggedFromList] = sourceList
+        this[targetListName] = targetList
+      }
+
+      this.draggedTask = null
+      this.draggedFromList = null
+    },
+
+    handleCategoryDrop(targetListName) {
+      if (!this.draggedTask || !this.draggedFromList) return
+      if (this.draggedFromList === targetListName) return
+
+      const sourceList = [...this[this.draggedFromList]]
+      const targetList = [...this[targetListName]]
+
+      const sourceIndex = sourceList.findIndex(item => item.id === this.draggedTask.id)
+
+      if (sourceIndex === -1) return
+
+      const [movedItem] = sourceList.splice(sourceIndex, 1)
+      targetList.push(movedItem)
+
+      this[this.draggedFromList] = sourceList
+      this[targetListName] = targetList
+
+      this.draggedTask = null
+      this.draggedFromList = null
     },
   },
 }
