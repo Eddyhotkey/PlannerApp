@@ -122,6 +122,11 @@ function saveEdit() {
   const trimmed = localTitle.value.trim()
 
   if (!trimmed) {
+    if ( props.task.isNew ) {
+      emit('remove-task', props.task )
+      return;
+    }
+
     localTitle.value = props.task.title
     isEditing.value = false
     return
