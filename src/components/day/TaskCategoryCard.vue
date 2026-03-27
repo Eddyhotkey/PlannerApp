@@ -1,5 +1,9 @@
 <template>
-  <section class="rounded-xl bg-indigo-100 p-4 shadow-sm">
+  <section
+    class="rounded-xl bg-indigo-100 p-4 shadow-sm"
+    @dragover.prevent
+    @drop="$emit('drop-category')"
+  >
     <div class="mb-4 flex items-center justify-between">
       <h2 class="text-lg font-semibold text-slate-800">{{ title }}</h2>
 
@@ -52,5 +56,6 @@ defineEmits([
   'update-priority',
   'drag-start',
   'drop-task',
+  'drop-category',
 ])
 </script>
