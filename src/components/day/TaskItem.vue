@@ -168,6 +168,10 @@ function saveEdit() {
 }
 
 function cancelEdit() {
+  if ( props.task.isNew ) {
+    emit( 'remove-task', props.task )
+    return;
+  }
   localTitle.value = props.task.title
   isEditing.value = false
 }
