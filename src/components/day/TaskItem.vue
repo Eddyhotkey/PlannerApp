@@ -176,6 +176,10 @@ function cancelEdit() {
   isEditing.value = false
 }
 
+function removeTask() {
+  emit( 'remove-task', props.task );
+}
+
 function cyclePriority() {
   const current = props.task.priority
 
