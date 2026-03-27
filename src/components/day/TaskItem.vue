@@ -1,15 +1,23 @@
 <template>
   <li
     :class="[
-      'flex items-center gap-3 rounded-lg bg-white p-3 shadow-sm transition',
-      isDropTarget ? 'ring-2 ring-blue-400 bg-blue-50' : ''
-    ]"
+    'relative flex items-center gap-3 rounded-lg bg-white p-3 shadow-sm transition'
+  ]"
     draggable="true"
     @dragstart="$emit('drag-start', task)"
-    @dragover.prevent = "$emit( 'drag-over-task', task )"
-    @dragleave = "$emit( 'drag-leave-task', task )"
-    @drop="$emit('drop-task', task)"
+    @dragover.prevent="handleDragOver"
+    @dragleave="$emit('drag-leave-task', task)"
+    @drop="handleDrop"
   >
+    <div
+      v-if="isDropTarget && dropPosition === 'before'"
+      class="absolute left-3 right-3 top-0 h-1 rounded-full bg-blue-500"
+    ></div>
+
+    <div
+      v-if="isDropTarget && dropPosition === 'after'"
+      class="absolute left-3 right-3 top-0 h-1 rounded-full bg-blue-500"
+    ></div>
     <input
       :checked="task.completed"
       type="checkbox"
@@ -100,6 +108,10 @@ const props = defineProps({
   isDropTarget: {
     type: Boolean,
     default: false,
+  },
+  dropPosition: {
+    type: String,
+    default: null,
   },
 })
 
@@ -204,6 +216,32 @@ function cyclePriority() {
   emit('update-priority', {
     id: props.task.id,
     priority: next,
+  })
+}
+
+function getDropPosition(event) {
+  const rect = event.currentTarget.getBoundingClientRect()
+  const offsetY = event.clientY - rect.top
+  const middleY = rect.height / 2
+
+  return offsetY < middleY ? 'before' : 'after'
+}
+
+function handleDragOver(event) {
+  const position = getDropPosition(event)
+
+  emit('drag-over-task', {
+    task: props.task,
+    position,
+  })
+}
+
+function handleDrop(event) {
+  const position = getDropPosition(event)
+
+  emit('drop-task', {
+    task: props.task,
+    position,
   })
 }
 </script>

@@ -34,7 +34,8 @@
         :key="task.id"
         :task="task"
         :is-drop-target="dropTargetTaskId === task.id"
-        @remove-task="$emit( 'remove-task', $event )"
+        :drop-position="dropTargetTaskId === task.id ? dropPosition : null"
+        @remove-task="$emit('remove-task', $event)"
         @toggle-completed="$emit('toggle-completed', $event)"
         @move-to-tomorrow="$emit('move-to-tomorrow', $event)"
         @update-title="$emit('update-title', $event)"
@@ -78,6 +79,7 @@ const emit = defineEmits([
 
 const isDragOver = ref(false);
 const dropTargetTaskId = ref( null );
+const dropPosition = ref(null)
 
 function handleDragEnter( ) {
   isDragOver.value = true;
@@ -96,28 +98,33 @@ function handleDragLeave ( event ) {
   }
 }
 
-function handleDropCategory( ) {
-  isDragOver.value = false;
-  emit( 'drop-category' );
-}
-
 function handleTaskDragStart ( task ) {
   emit( 'drag-start', task );
 }
-
-function handleTaskDragOver ( task ) {
-  isDragOver.value = true;
-  dropTargetTaskId.value = task.id;
+function handleTaskDragOver(payload) {
+  isDragOver.value = true
+  dropTargetTaskId.value = payload.task.id
+  dropPosition.value = payload.position
 }
 
-function handleTaskDragLeave ( ) {
-  dropTargetTaskId.value =null;
+function handleTaskDragLeave() {
+  dropTargetTaskId.value = null
+  dropPosition.value = null
 }
 
-function handleTaskDrop( task ) {
-  isDragOver.value = false;
-  dropTargetTaskId.value = null;
-  emit( 'drop-task', task)
+function handleTaskDrop(payload) {
+  isDragOver.value = false
+  dropTargetTaskId.value = null
+  dropPosition.value = null
+
+  emit('drop-task', payload)
+}
+
+function handleDropCategory() {
+  isDragOver.value = false
+  dropTargetTaskId.value = null
+  dropPosition.value = null
+  emit('drop-category')
 }
 
 </script>

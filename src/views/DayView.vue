@@ -11,7 +11,7 @@
         @update-title="payload => updateTaskTitle(payload, 'arbeitTasks')"
         @update-priority="payload => updateTaskPriority(payload, 'arbeitTasks')"
         @drag-start="task => handleDragStart(task, 'arbeitTasks')"
-        @drop-task="task => handleDrop(task, 'arbeitTasks')"
+        @drop-task="payload => handleDrop(payload, 'arbeitTasks')"
         @drop-category="handleCategoryDrop('arbeitTasks')"
       />
 
@@ -25,7 +25,7 @@
         @update-title="payload => updateTaskTitle(payload, 'familieTasks')"
         @update-priority="payload => updateTaskPriority(payload, 'familieTasks')"
         @drag-start="task => handleDragStart(task, 'familieTasks')"
-        @drop-task="task => handleDrop(task, 'familieTasks')"
+        @drop-task="payload => handleDrop(payload, 'familieTasks')"
         @drop-category="handleCategoryDrop('familieTasks')"
       />
 
@@ -39,7 +39,7 @@
         @update-title="payload => updateTaskTitle(payload, 'persoenlichTasks')"
         @update-priority="payload => updateTaskPriority(payload, 'persoenlichTasks')"
         @drag-start="task => handleDragStart(task, 'persoenlichTasks')"
-        @drop-task="task => handleDrop(task, 'persoenlichTasks')"
+        @drop-task="payload => handleDrop(payload, 'persoenlichTasks')"
         @drop-category="handleCategoryDrop('persoenlichTasks')"
       />
     </div>
@@ -135,8 +135,10 @@ export default {
       this.draggedFromList = listName
     },
 
-    handleDrop(targetTask, targetListName) {
+    handleDrop(payload, targetListName) {
       if (!this.draggedTask || !this.draggedFromList) return
+
+      const { task: targetTask, position } = payload
 
       const sourceList = [...this[this.draggedFromList]]
       const targetList = [...this[targetListName]]
@@ -147,12 +149,32 @@ export default {
       if (sourceIndex === -1 || targetIndex === -1) return
 
       if (this.draggedFromList === targetListName) {
-        const [movedItem] = targetList.splice(sourceIndex, 1)
-        targetList.splice(targetIndex, 0, movedItem)
-        this[targetListName] = targetList
+        const movingInSameList = [...targetList]
+        const currentIndex = movingInSameList.findIndex(item => item.id === this.draggedTask.id)
+        const [movedItem] = movingInSameList.splice(currentIndex, 1)
+
+        let insertIndex = movingInSameList.findIndex(item => item.id === targetTask.id)
+
+        if (insertIndex === -1) return
+
+        if (position === 'after') {
+          insertIndex += 1
+        }
+
+        movingInSameList.splice(insertIndex, 0, movedItem)
+        this[targetListName] = movingInSameList
       } else {
         const [movedItem] = sourceList.splice(sourceIndex, 1)
-        targetList.splice(targetIndex, 0, movedItem)
+
+        let insertIndex = targetList.findIndex(item => item.id === targetTask.id)
+
+        if (insertIndex === -1) return
+
+        if (position === 'after') {
+          insertIndex += 1
+        }
+
+        targetList.splice(insertIndex, 0, movedItem)
 
         this[this.draggedFromList] = sourceList
         this[targetListName] = targetList
