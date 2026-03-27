@@ -116,6 +116,10 @@ const priorityClass = computed(() => {
 function startEdit() {
   isEditing.value = true
   localTitle.value = props.task.title
+
+  nextTick(() => {
+    titleInput.value?.focus()
+  })
 }
 
 function saveEdit() {
