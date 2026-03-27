@@ -4,6 +4,8 @@
       <TaskCategoryCard
         title="Arbeit"
         :tasks="arbeitTasks"
+        @add-task="addTask('arbeitTasks')"
+        @remove-task="task => removeTask(task, 'arbeitTasks')"
         @toggle-completed="task => toggleTaskCompleted(task, 'arbeitTasks')"
         @move-to-tomorrow="task => moveTaskToTomorrow(task, 'arbeitTasks')"
         @update-title="payload => updateTaskTitle(payload, 'arbeitTasks')"
@@ -15,6 +17,8 @@
       <TaskCategoryCard
         title="Familie"
         :tasks="familieTasks"
+        @add-task="addTask('familieTasks')"
+        @remove-task="task => removeTask(task, 'familieTasks')"
         @toggle-completed="task => toggleTaskCompleted(task, 'familieTasks')"
         @move-to-tomorrow="task => moveTaskToTomorrow(task, 'familieTasks')"
         @update-title="payload => updateTaskTitle(payload, 'familieTasks')"
@@ -26,6 +30,8 @@
       <TaskCategoryCard
         title="Persönlich"
         :tasks="persoenlichTasks"
+        @add-task="addTask('persoenlichTasks')"
+        @remove-task="task => removeTask(task, 'persoenlichTasks')"
         @toggle-completed="task => toggleTaskCompleted(task, 'persoenlichTasks')"
         @move-to-tomorrow="task => moveTaskToTomorrow(task, 'persoenlichTasks')"
         @update-title="payload => updateTaskTitle(payload, 'persoenlichTasks')"
@@ -76,6 +82,23 @@ export default {
   },
 
   methods: {
+
+    addTask(listName) {
+      const newTask = {
+        id: Date.now(),
+        title: '',
+        completed: false,
+        priority: 'medium',
+        isNew: true,
+      }
+
+      this[listName].push(newTask)
+    },
+
+    removeTask( task, listName ) {
+      this[ listName ] = this[ listName ].filter( item => item.id !== task.id )
+    },
+
     toggleTaskCompleted(task, listName) {
       const currentTask = this[listName].find(item => item.id === task.id)
       if (currentTask) {
@@ -91,6 +114,7 @@ export default {
       const currentTask = this[listName].find(item => item.id === payload.id)
       if (currentTask) {
         currentTask.title = payload.title
+        currentTask.isNew = false
       }
     },
 
