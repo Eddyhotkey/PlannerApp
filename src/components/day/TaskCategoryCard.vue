@@ -33,6 +33,7 @@
         v-for="task in tasks"
         :key="task.id"
         :task="task"
+        :is-dragging="draggedTaskId === task.id"
         :is-drop-target="dropTargetTaskId === task.id"
         :drop-position="dropTargetTaskId === task.id ? dropPosition : null"
         @remove-task="$emit('remove-task', $event)"
@@ -41,6 +42,7 @@
         @update-title="$emit('update-title', $event)"
         @update-priority="$emit('update-priority', $event)"
         @drag-start="handleTaskDragStart"
+        @drag-end="$emit('drag-end')"
         @drag-over-task="handleTaskDragOver"
         @drag-leave-task="handleTaskDragLeave"
         @drop-task="handleTaskDrop"
@@ -62,6 +64,10 @@ defineProps({
     type: Array,
     required: true,
   },
+  draggedTaskId: {
+    type: [Number, String, null],
+    default: null,
+  },
 })
 
 
@@ -73,6 +79,7 @@ const emit = defineEmits([
   'update-title',
   'update-priority',
   'drag-start',
+  'drag-end',
   'drop-task',
   'drop-category',
 ])

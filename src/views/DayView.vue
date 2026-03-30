@@ -4,6 +4,7 @@
       <TaskCategoryCard
         title="Arbeit"
         :tasks="arbeitTasks"
+        :dragged-task-id="draggedTask?.id ?? null"
         @add-task="addTask('arbeitTasks')"
         @remove-task="task => removeTask(task, 'arbeitTasks')"
         @toggle-completed="task => toggleTaskCompleted(task, 'arbeitTasks')"
@@ -11,6 +12,7 @@
         @update-title="payload => updateTaskTitle(payload, 'arbeitTasks')"
         @update-priority="payload => updateTaskPriority(payload, 'arbeitTasks')"
         @drag-start="task => handleDragStart(task, 'arbeitTasks')"
+        @drag-end="handleDragEnd"
         @drop-task="payload => handleDrop(payload, 'arbeitTasks')"
         @drop-category="handleCategoryDrop('arbeitTasks')"
       />
@@ -18,6 +20,7 @@
       <TaskCategoryCard
         title="Familie"
         :tasks="familieTasks"
+        :dragged-task-id="draggedTask?.id ?? null"
         @add-task="addTask('familieTasks')"
         @remove-task="task => removeTask(task, 'familieTasks')"
         @toggle-completed="task => toggleTaskCompleted(task, 'familieTasks')"
@@ -25,6 +28,7 @@
         @update-title="payload => updateTaskTitle(payload, 'familieTasks')"
         @update-priority="payload => updateTaskPriority(payload, 'familieTasks')"
         @drag-start="task => handleDragStart(task, 'familieTasks')"
+        @drag-end="handleDragEnd"
         @drop-task="payload => handleDrop(payload, 'familieTasks')"
         @drop-category="handleCategoryDrop('familieTasks')"
       />
@@ -32,6 +36,7 @@
       <TaskCategoryCard
         title="Persönlich"
         :tasks="persoenlichTasks"
+        :dragged-task-id="draggedTask?.id ?? null"
         @add-task="addTask('persoenlichTasks')"
         @remove-task="task => removeTask(task, 'persoenlichTasks')"
         @toggle-completed="task => toggleTaskCompleted(task, 'persoenlichTasks')"
@@ -39,6 +44,7 @@
         @update-title="payload => updateTaskTitle(payload, 'persoenlichTasks')"
         @update-priority="payload => updateTaskPriority(payload, 'persoenlichTasks')"
         @drag-start="task => handleDragStart(task, 'persoenlichTasks')"
+        @drag-end="handleDragEnd"
         @drop-task="payload => handleDrop(payload, 'persoenlichTasks')"
         @drop-category="handleCategoryDrop('persoenlichTasks')"
       />
@@ -204,6 +210,11 @@ export default {
       this.draggedTask = null
       this.draggedFromList = null
     },
+
+    handleDragEnd() {
+      this.draggedTask = null
+      this.draggedFromList = null
+    }
   },
 }
 </script>

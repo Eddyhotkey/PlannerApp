@@ -1,10 +1,12 @@
 <template>
   <li
     :class="[
-    'relative flex items-center gap-3 rounded-lg bg-white p-3 shadow-sm transition'
+    'relative flex items-center gap-3 rounded-lg bg-white p-3 shadow-sm transition',
+    isDragging ? 'opacity-40 ring-1 ring-slate-300 border border-dashed border-slate-400' : ''
   ]"
     draggable="true"
     @dragstart="$emit('drag-start', task)"
+    @dragend="$emit('drag-end')"
     @dragover.prevent="handleDragOver"
     @dragleave="$emit('drag-leave-task', task)"
     @drop="handleDrop"
@@ -113,6 +115,10 @@ const props = defineProps({
     type: String,
     default: null,
   },
+  isDragging: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const emit = defineEmits([
@@ -121,6 +127,7 @@ const emit = defineEmits([
   'update-title',
   'update-priority',
   'drag-start',
+  'drag-end',
   'drop-task',
   'remove-task',
   'drag-over-task',
