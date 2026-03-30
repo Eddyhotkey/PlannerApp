@@ -1,8 +1,14 @@
 <template>
   <li
     :class="[
-    'relative flex items-center gap-3 rounded-lg bg-white p-3 shadow-sm transition',
-    isDragging ? 'opacity-40 ring-1 ring-slate-300 border border-dashed border-slate-400' : ''
+    'relative flex cursor-grab items-center gap-3 rounded-lg border border-transparent bg-white p-3 shadow-sm transition-all duration-150',
+    isDragging
+      ?
+      'z-10 scale-[0.90] cursor-grabbing border-dashed border-slate-400 opacity-50 shadow-md ring-1 ring-slate-300'
+      : 'hover:shadow-md',
+    isDropTarget ? 'bg-blue-50' : '',
+    isDropTarget && dropPosition === 'before' ? 'mt-3' : '',
+    isDropTarget && dropPosition === 'after' ? 'mb-3' : '',
   ]"
     draggable="true"
     @dragstart="$emit('drag-start', task)"
@@ -18,7 +24,7 @@
 
     <div
       v-if="isDropTarget && dropPosition === 'after'"
-      class="absolute left-3 right-3 top-0 h-1 rounded-full bg-blue-500"
+      class="absolute left-3 right-3 bottom-0 h-1 rounded-full bg-blue-500"
     ></div>
     <input
       :checked="task.completed"
