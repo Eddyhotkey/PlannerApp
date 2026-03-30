@@ -1,5 +1,5 @@
 <template>
-  <li class="rounded-lg bg-white p-3 shadow-sm">
+  <li class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:shadow-md">
     <template v-if="isEditing">
       <div class="space-y-3">
         <div class="grid grid-cols-2 gap-3">
@@ -82,34 +82,49 @@
         </div>
       </div>
     </template>
-
     <template v-else>
-      <div class="flex items-start justify-between gap-3">
-        <div>
-          <p class="text-sm font-semibold text-slate-800">
-            {{ appointment.start }} - {{ appointment.end }}
-          </p>
-          <p class="text-sm text-slate-600">
-            {{ appointment.title }}
-          </p>
+      <div class="flex items-start gap-4">
+        <div
+          class="flex min-w-[72px] flex-col items-center rounded-lg bg-indigo-50 px-3 py-3 text-indigo-700">
+          <span class="text-sm font-semibold leading-none">
+            {{ appointment.start }}
+          </span>
+            <span class="my-1 h-4 w-px bg-indigo-200"></span>
+
+            <span class="text-xs font-medium leading-none text-indigo-500">
+              {{ appointment.end }}
+            </span>
         </div>
 
-        <div class="flex items-center gap-2">
-          <button
-            type="button"
-            class="rounded-md px-2 py-1 text-xs text-slate-500 hover:bg-slate-100"
-            @click="startEdit"
-          >
-            Bearbeiten
-          </button>
+        <div class="min-w-0 flex-1">
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <p class="truncate text-sm font-semibold text-slate-800">
+                {{ appointment.title }}
+              </p>
+              <p class="mt-1 text-xs text-slate-500">
+                Termin
+              </p>
+            </div>
 
-          <button
-            type="button"
-            class="rounded-md px-2 py-1 text-xs text-red-600 hover:bg-red-50"
-            @click="removeAppointment"
-          >
-            Löschen
-          </button>
+            <div class="flex shrink-0 items-center gap-2">
+              <button
+                type="button"
+                class="rounded-md px-2 py-1 text-xs text-slate-500 hover:bg-slate-100"
+                @click="startEdit"
+              >
+                Bearbeiten
+              </button>
+
+              <button
+                type="button"
+                class="rounded-md px-2 py-1 text-xs text-red-600 hover:bg-red-50"
+                @click="removeAppointment"
+              >
+                Löschen
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </template>

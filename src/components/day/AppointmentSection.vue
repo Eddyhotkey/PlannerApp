@@ -1,5 +1,5 @@
 <template>
-  <aside class="rounded-xl bg-indigo-100 p-4 shadow-sm lg:col-span-2">
+  <aside class="rounded-xl border border-slate-200 bg-slate-50 p-4 shadow-sm lg:col-span-2">
     <div class="mb-4 flex items-center justify-between">
       <h2 class="text-lg font-semibold text-slate-800">Termine</h2>
 
@@ -12,7 +12,7 @@
       </button>
     </div>
 
-    <ul class="space-y-3">
+    <ul v-if="appointments.length" class="space-y-3">
       <AppointmentItem
         v-for="appointment in appointments"
         :key="appointment.id"
@@ -21,6 +21,13 @@
         @remove-appointment="$emit('remove-appointment', $event)"
       />
     </ul>
+
+    <p
+      v-else
+      class="rounded-lg border border-dashed border-slate-300 bg-white px-4 py-6 text-center text-sm text-slate-500"
+    >
+      Noch keine Termine für heute.
+    </p>
   </aside>
 </template>
 
