@@ -6,6 +6,7 @@
       <button
         type="button"
         class="rounded-lg bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
+        @click="$emit('add-appointment')"
       >
         + Termin
       </button>
@@ -16,18 +17,26 @@
         v-for="appointment in appointments"
         :key="appointment.id"
         :appointment="appointment"
+        @update-appointment="$emit('update-appointment', $event)"
+        @remove-appointment="$emit('remove-appointment', $event)"
       />
     </ul>
   </aside>
 </template>
 
 <script setup>
-  import AppointmentItem from "@/components/day/AppointmentItem.vue";
+import AppointmentItem from '@/components/day/AppointmentItem.vue'
 
-  defineProps({
-    appointments: {
-      type: Array,
-      required: true,
-    }
-  })
+defineProps({
+  appointments: {
+    type: Array,
+    required: true,
+  },
+})
+
+defineEmits([
+  'add-appointment',
+  'update-appointment',
+  'remove-appointment',
+])
 </script>

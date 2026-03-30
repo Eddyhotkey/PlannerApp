@@ -50,7 +50,12 @@
       />
     </div>
 
-    <AppointmentSection :appointments="appointments" />
+    <AppointmentSection
+      :appointments="appointments"
+      @add-appointment="addAppointment"
+      @update-appointment="updateAppointment"
+      @remove-appointment="removeAppointment"
+    />
   </div>
 </template>
 
@@ -84,8 +89,8 @@ export default {
         { id: 6, title: 'Vue lernen', completed: false, priority: 'high' },
       ],
       appointments: [
-        { id: 1, time: '14:30', title: 'Ilias abholen' },
-        { id: 2, time: '15:00', title: 'Leon abholen' },
+        { id: 1, start: '14:30', end: '15:00', title: 'Ilias abholen' },
+        { id: 2, start: '15:00', end: '15:30', title: 'Leon abholen' },
       ],
     }
   },
@@ -214,7 +219,49 @@ export default {
     handleDragEnd() {
       this.draggedTask = null
       this.draggedFromList = null
-    }
+    },
+
+
+    // Appointments:
+
+    addAppointment() {
+      const newAppointment = {
+        id: Date.now(),
+        start: '',
+        end: '',
+        title: '',
+        isNew: true,
+      }
+
+      this.appointments.push(newAppointment)
+    },
+
+    updateAppointment(payload) {
+      const currentAppointment = this.appointments.find(
+        item => item.id === payload.id
+      )
+
+      if (currentAppointment) {
+        currentAppointment.start = payload.start
+        currentAppointment.end = payload.end
+        currentAppointment.title = payload.title
+        currentAppointment.isNew = false
+
+        this.sortAppointments()
+      }
+    },
+
+    removeAppointment(appointment) {
+      this.appointments = this.appointments.filter(
+        item => item.id !== appointment.id
+      )
+    },
+
+    sortAppointments() {
+      this.appointments = [...this.appointments].sort((a, b) =>
+        a.start.localeCompare(b.start)
+      )
+    },
   },
 }
 </script>
