@@ -17,6 +17,7 @@
         v-for="appointment in appointments"
         :key="appointment.id"
         :appointment="appointment"
+        :appointments="appointments"
         @update-appointment="$emit('update-appointment', $event)"
         @remove-appointment="$emit('remove-appointment', $event)"
       />

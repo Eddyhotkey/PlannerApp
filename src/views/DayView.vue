@@ -241,14 +241,32 @@ export default {
         item => item.id === payload.id
       )
 
-      if (currentAppointment) {
-        currentAppointment.start = payload.start
-        currentAppointment.end = payload.end
-        currentAppointment.title = payload.title
-        currentAppointment.isNew = false
-
-        this.sortAppointments()
+      if (!currentAppointment) {
+        return { success: false }
       }
+
+      const updatedAppointment = {
+        ...currentAppointment,
+        start: payload.start,
+        end: payload.end,
+        title: payload.title,
+      }
+
+      if (this.hasAppointmentOverlap(updatedAppointment)) {
+        return {
+          success: false,
+          error: 'overlap',
+        }
+      }
+
+      currentAppointment.start = payload.start
+      currentAppointment.end = payload.end
+      currentAppointment.title = payload.title
+      currentAppointment.isNew = false
+
+      this.sortAppointments()
+
+      return { success: true }
     },
 
     removeAppointment(appointment) {
@@ -262,6 +280,15 @@ export default {
         a.start.localeCompare(b.start)
       )
     },
+
+    hasAppointmentOverlap( updateAppointment ) {
+      return this.appointments.some((appointment) => () => {
+        if (appointment.id === updateAppointment.id ) {
+          return false;
+        }
+        return updateAppointment.start < appointment.end && updateAppointment.end > appointment.start
+      })
+    }
   },
 }
 </script>

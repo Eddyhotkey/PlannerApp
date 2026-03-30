@@ -55,6 +55,13 @@
           Die Endzeit muss nach der Startzeit liegen.
         </p>
 
+        <p
+          v-if="showOverlapError"
+          class="text-xs text-red-600"
+        >
+          Dieser Termin überschneidet sich mit einem anderen Termin.
+        </p>
+
         <div class="flex items-center gap-2">
           <button
             type="button"
@@ -139,6 +146,10 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  appointments: {
+    type: Array,
+    required: true,
+  }
 })
 
 const emit = defineEmits([
@@ -154,6 +165,8 @@ const localTitle = ref(props.appointment.title || '')
 const startInput = ref(null)
 const endInput = ref(null)
 const titleInput = ref(null)
+
+const showOverlapError = ref( false)
 
 watch(
   () => props.appointment.start,
@@ -193,6 +206,7 @@ const showTimeError = computed(() => {
 
 function startEdit() {
   isEditing.value = true
+  showOverlapError.value = false
   localStart.value = props.appointment.start || ''
   localEnd.value = props.appointment.end || ''
   localTitle.value = props.appointment.title || ''
@@ -200,6 +214,20 @@ function startEdit() {
   nextTick(() => {
     startInput.value?.focus()
   })
+}
+
+function cancelEdit() {
+  showOverlapError.value = false
+
+  if (props.appointment.isNew) {
+    emit('remove-appointment', props.appointment)
+    return
+  }
+
+  localStart.value = props.appointment.start || ''
+  localEnd.value = props.appointment.end || ''
+  localTitle.value = props.appointment.title || ''
+  isEditing.value = false
 }
 
 function focusEndInput() {
@@ -219,6 +247,8 @@ function saveEdit() {
   const trimmedEnd = localEnd.value.trim()
   const trimmedTitle = localTitle.value.trim()
 
+  showOverlapError.value = false
+
   if (!trimmedStart || !trimmedEnd || !trimmedTitle) {
     if (props.appointment.isNew) {
       emit('remove-appointment', props.appointment)
@@ -236,6 +266,11 @@ function saveEdit() {
     return
   }
 
+  if (hasOverlap(trimmedStart, trimmedEnd)) {
+    showOverlapError.value = true
+    return
+  }
+
   emit('update-appointment', {
     id: props.appointment.id,
     start: trimmedStart,
@@ -246,17 +281,6 @@ function saveEdit() {
   isEditing.value = false
 }
 
-function cancelEdit() {
-  if (props.appointment.isNew) {
-    emit('remove-appointment', props.appointment)
-    return
-  }
-
-  localStart.value = props.appointment.start || ''
-  localEnd.value = props.appointment.end || ''
-  localTitle.value = props.appointment.title || ''
-  isEditing.value = false
-}
 
 function handleTitleBlur() {
   saveEdit()
@@ -264,5 +288,15 @@ function handleTitleBlur() {
 
 function removeAppointment() {
   emit('remove-appointment', props.appointment)
+}
+
+function hasOverlap(start, end) {
+  return props.appointments.some((appointment) => {
+    if (appointment.id === props.appointment.id) {
+      return false
+    }
+
+    return start < appointment.end && end > appointment.start
+  })
 }
 </script>
