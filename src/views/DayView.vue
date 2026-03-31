@@ -50,18 +50,23 @@
       />
     </div>
 
-    <AppointmentSection
-      :appointments="appointments"
-      @add-appointment="addAppointment"
-      @update-appointment="updateAppointment"
-      @remove-appointment="removeAppointment"
-    />
+    <div class="space-y-4 lg:col-span-2">
+      <AppointmentSection
+        :appointments="appointments"
+        @add-appointment="addAppointment"
+        @update-appointment="updateAppointment"
+        @remove-appointment="removeAppointment"
+      />
+
+      <DayTimeline :appointments="appointments" />
+    </div>
   </div>
 </template>
 
 <script>
 import AppointmentSection from '@/components/day/AppointmentSection.vue'
 import TaskCategoryCard from '@/components/day/TaskCategoryCard.vue'
+import DayTimeline from '@/components/day/DayTimeline.vue'
 
 export default {
   name: 'DayView',
@@ -69,6 +74,7 @@ export default {
   components: {
     AppointmentSection,
     TaskCategoryCard,
+    DayTimeline,
   },
 
   data() {
@@ -281,12 +287,16 @@ export default {
       )
     },
 
-    hasAppointmentOverlap( updateAppointment ) {
-      return this.appointments.some((appointment) => () => {
-        if (appointment.id === updateAppointment.id ) {
-          return false;
+    hasAppointmentOverlap(updatedAppointment) {
+      return this.appointments.some((appointment) => {
+        if (appointment.id === updatedAppointment.id) {
+          return false
         }
-        return updateAppointment.start < appointment.end && updateAppointment.end > appointment.start
+
+        return (
+          updatedAppointment.start < appointment.end &&
+          updatedAppointment.end > appointment.start
+        )
       })
     }
   },
