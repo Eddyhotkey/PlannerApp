@@ -1,11 +1,10 @@
 <template>
-  <aside class="rounded-xl border border-slate-200 bg-slate-50 p-4 shadow-sm lg:col-span-2">
+  <aside class="rounded-xl border border-slate-200 bg-slate-50 p-4 shadow-sm">
     <div class="mb-4 flex items-center justify-between">
       <h2 class="text-lg font-semibold text-slate-800">Termine</h2>
 
       <button
-        type="button"
-        class="rounded-lg bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
+        class="rounded-lg bg-white px-3 py-1.5 text-sm shadow-sm hover:bg-slate-50"
         @click="$emit('add-appointment')"
       >
         + Termin
@@ -14,20 +13,17 @@
 
     <ul v-if="appointments.length" class="space-y-3">
       <AppointmentItem
-        v-for="appointment in appointments"
-        :key="appointment.id"
-        :appointment="appointment"
+        v-for="a in appointments"
+        :key="a.id"
+        :appointment="a"
         :appointments="appointments"
-        @update-appointment="$emit('update-appointment', $event)"
-        @remove-appointment="$emit('remove-appointment', $event)"
+        :save-appointment="saveAppointment"
+        :delete-appointment="deleteAppointment"
       />
     </ul>
 
-    <p
-      v-else
-      class="rounded-lg border border-dashed border-slate-300 bg-white px-4 py-6 text-center text-sm text-slate-500"
-    >
-      Noch keine Termine für heute.
+    <p v-else class="text-sm text-slate-500 text-center py-6">
+      Noch keine Termine
     </p>
   </aside>
 </template>
@@ -36,15 +32,10 @@
 import AppointmentItem from '@/components/day/AppointmentItem.vue'
 
 defineProps({
-  appointments: {
-    type: Array,
-    required: true,
-  },
+  appointments: Array,
+  saveAppointment: Function,
+  deleteAppointment: Function,
 })
 
-defineEmits([
-  'add-appointment',
-  'update-appointment',
-  'remove-appointment',
-])
+defineEmits(['add-appointment'])
 </script>

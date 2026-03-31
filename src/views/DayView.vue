@@ -53,9 +53,9 @@
     <div class="space-y-4 lg:col-span-2">
       <AppointmentSection
         :appointments="appointments"
+        :save-appointment="updateAppointment"
+        :delete-appointment="removeAppointment"
         @add-appointment="addAppointment"
-        @update-appointment="updateAppointment"
-        @remove-appointment="removeAppointment"
       />
 
       <DayTimeline :appointments="appointments" />
@@ -243,32 +243,26 @@ export default {
     },
 
     updateAppointment(payload) {
-      const currentAppointment = this.appointments.find(
-        item => item.id === payload.id
-      )
+      const current = this.appointments.find(a => a.id === payload.id)
 
-      if (!currentAppointment) {
-        return { success: false }
-      }
+      if (!current) return { success: false }
 
-      const updatedAppointment = {
-        ...currentAppointment,
-        start: payload.start,
-        end: payload.end,
-        title: payload.title,
-      }
+      const updated = { ...current, ...payload }
 
-      if (this.hasAppointmentOverlap(updatedAppointment)) {
+      const overlap = this.getOverlappingAppointment(updated)
+
+      if (overlap) {
         return {
           success: false,
           error: 'overlap',
+          overlappingAppointment: overlap,
         }
       }
 
-      currentAppointment.start = payload.start
-      currentAppointment.end = payload.end
-      currentAppointment.title = payload.title
-      currentAppointment.isNew = false
+      current.start = payload.start
+      current.end = payload.end
+      current.title = payload.title
+      current.isNew = false
 
       this.sortAppointments()
 
@@ -276,9 +270,7 @@ export default {
     },
 
     removeAppointment(appointment) {
-      this.appointments = this.appointments.filter(
-        item => item.id !== appointment.id
-      )
+      this.appointments = this.appointments.filter(a => a.id !== appointment.id)
     },
 
     sortAppointments() {
@@ -287,18 +279,13 @@ export default {
       )
     },
 
-    hasAppointmentOverlap(updatedAppointment) {
-      return this.appointments.some((appointment) => {
-        if (appointment.id === updatedAppointment.id) {
-          return false
-        }
+    getOverlappingAppointment(updated) {
+      return this.appointments.find(a => {
+        if (a.id === updated.id) return false
 
-        return (
-          updatedAppointment.start < appointment.end &&
-          updatedAppointment.end > appointment.start
-        )
+        return updated.start < a.end && updated.end > a.start
       })
-    }
+    },
   },
 }
 </script>
