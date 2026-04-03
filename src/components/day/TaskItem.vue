@@ -1,15 +1,14 @@
 <template>
   <li
     :class="[
-    'relative flex cursor-grab items-center gap-3 rounded-lg border border-transparent bg-white p-3 shadow-sm transition-all duration-150',
-    isDragging
-      ?
-      'z-10 scale-[0.90] cursor-grabbing border-dashed border-slate-400 opacity-50 shadow-md ring-1 ring-slate-300'
-      : 'hover:shadow-md',
-    isDropTarget ? 'bg-blue-50' : '',
-    isDropTarget && dropPosition === 'before' ? 'mt-3' : '',
-    isDropTarget && dropPosition === 'after' ? 'mb-3' : '',
-  ]"
+      'relative flex cursor-grab items-center gap-1 rounded-md border border-neutral-200 dark:border-neutral-500 bg-neutral-50 dark:bg-neutral-700 p-2 transition-all duration-150',
+      isDragging
+        ? 'z-10 scale-[0.90] cursor-grabbing border-dashed border-neutral-400 opacity-50 shadow-md ring-1 ring-neutral-300'
+        : 'hover:shadow-md',
+      isDropTarget ? 'bg-neutral-50' : '',
+      isDropTarget && dropPosition === 'before' ? 'mt-3' : '',
+      isDropTarget && dropPosition === 'after' ? 'mb-3' : '',
+    ]"
     draggable="true"
     @dragstart="$emit('drag-start', task)"
     @dragend="$emit('drag-end')"
@@ -19,27 +18,29 @@
   >
     <div
       v-if="isDropTarget && dropPosition === 'before'"
-      class="absolute left-3 right-3 top-0 h-1 rounded-full bg-blue-500"
+      class="absolute left-3 right-3 top-0 h-1 rounded-full bg-neutral-500"
     ></div>
 
     <div
       v-if="isDropTarget && dropPosition === 'after'"
-      class="absolute left-3 right-3 bottom-0 h-1 rounded-full bg-blue-500"
+      class="absolute left-3 right-3 bottom-0 h-1 rounded-full bg-neutral-500"
     ></div>
+
     <input
       :checked="task.completed"
       type="checkbox"
-      class="h-5 w-5 cursor-pointer"
+      class="h-5 w-5 bg-neutral-300 cursor-pointer rounded-lg text-neutral-400 dark:text-neutral-400
+      border border-neutral-200 dark:border-neutral-500"
       @change="$emit('toggle-completed', task)"
     />
-
+    <div></div>
     <div class="flex-1">
       <template v-if="isEditing">
         <input
           ref="titleInput"
           v-model="localTitle"
           type="text"
-          class="w-full rounded-md border border-slate-300 px-2 py-1 text-sm"
+          class="w-full rounded-md border border-neutral-300 px-2 py-1 text-sm"
           @keyup.enter="saveEdit"
           @keyup.esc="cancelEdit"
           @blur="saveEdit"
@@ -50,7 +51,8 @@
         <div
           :class="[
             'text-sm transition',
-            task.completed ? 'line-through text-slate-400' : 'text-slate-700'
+            task.completed ? 'line-through text-neutral-400 dark:text-neutral-400' :
+            'text-neutral-700 dark:text-white'
           ]"
         >
           {{ task.title }}
@@ -67,7 +69,8 @@
 
     <button
       type="button"
-      class="rounded-md px-2 py-1 text-xs text-slate-500 hover:bg-slate-100"
+      class="rounded-md px-2 py-1 text-xs text-neutral-500 dark:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-400 cursor-pointer"
+      @mousedown.prevent
       @click="cyclePriority"
     >
       Priorität
@@ -76,18 +79,17 @@
     <button
       v-if="!task.completed && !isEditing"
       type="button"
-      class="rounded-md px-2 py-1 text-xs text-slate-500 hover:bg-slate-100"
+      class="rounded-md px-2 py-1 text-xs text-neutral-500 dark:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-red-400 cursor-pointer"
       @click="$emit('move-to-tomorrow', task)"
     >
       Morgen
     </button>
 
-
     <button
       v-if="!isEditing"
       type="button"
-      class="rounded-md px-2 py-1 text-xs text-slate-500 hover:bg-slate-100 cursor-pointer"
-      @click="startEdit"
+      class="cursor-pointer rounded-md text-xs"
+      @click="$emit('start-editing', task)"
     >
       <IconEdit />
     </button>
@@ -95,7 +97,7 @@
     <button
       v-if="!isEditing"
       type="button"
-      class="rounded-md px-2 py-1 text-xs text-red-600 hover:bg-red-50 cursor-pointer"
+      class="cursor-pointer rounded-md text-xs"
       @click="removeTask"
     >
       <IconTrash />
@@ -105,13 +107,17 @@
 
 <script setup>
 import { computed, nextTick, ref, watch } from 'vue'
-import IconEdit from "@/components/icons/IconEdit.vue";
-import IconTrash from "@/components/icons/IconTrash.vue";
+import IconEdit from '@/components/icons/IconEdit.vue'
+import IconTrash from '@/components/icons/IconTrash.vue'
 
 const props = defineProps({
   task: {
     type: Object,
     required: true,
+  },
+  isEditing: {
+    type: Boolean,
+    default: false,
   },
   isDropTarget: {
     type: Boolean,
@@ -138,9 +144,10 @@ const emit = defineEmits([
   'remove-task',
   'drag-over-task',
   'drag-leave-task',
+  'start-editing',
+  'cancel-editing',
 ])
 
-const isEditing = ref(false)
 const localTitle = ref(props.task.title)
 const titleInput = ref(null)
 
@@ -152,10 +159,13 @@ watch(
 )
 
 watch(
-  () => props.task.isNew,
-  (isNew) => {
-    if (isNew) {
-      startEdit()
+  () => props.isEditing,
+  async (value) => {
+    if (value) {
+      localTitle.value = props.task.title === 'Neue Aufgabe' ? '' : props.task.title
+      await nextTick()
+      titleInput.value?.focus()
+      titleInput.value?.select()
     }
   },
   { immediate: true }
@@ -169,30 +179,16 @@ const priorityLabel = computed(() => {
 
 const priorityClass = computed(() => {
   if (props.task.priority === 'high') return 'bg-red-100 text-red-700'
-  if (props.task.priority === 'low') return 'bg-slate-100 text-slate-600'
+  if (props.task.priority === 'low') return 'bg-neutral-100 text-neutral-600'
   return 'bg-amber-100 text-amber-700'
 })
-
-function startEdit() {
-  isEditing.value = true
-  localTitle.value = props.task.title
-
-  nextTick(() => {
-    titleInput.value?.focus()
-  })
-}
 
 function saveEdit() {
   const trimmed = localTitle.value.trim()
 
+  // 🔥 NEU: wenn leer → löschen
   if (!trimmed) {
-    if ( props.task.isNew ) {
-      emit('remove-task', props.task )
-      return;
-    }
-
-    localTitle.value = props.task.title
-    isEditing.value = false
+    emit('remove-task', props.task)
     return
   }
 
@@ -200,21 +196,18 @@ function saveEdit() {
     id: props.task.id,
     title: trimmed,
   })
-
-  isEditing.value = false
 }
 
 function cancelEdit() {
-  if ( props.task.isNew ) {
-    emit( 'remove-task', props.task )
-    return;
-  }
-  localTitle.value = props.task.title
-  isEditing.value = false
+  const trimmed = localTitle.value.trim()
+  emit('cancel-editing', {
+    id: props.task.id,
+    title: trimmed,
+  })
 }
 
 function removeTask() {
-  emit( 'remove-task', props.task );
+  emit('remove-task', props.task)
 }
 
 function cyclePriority() {
@@ -253,7 +246,7 @@ function handleDrop(event) {
   const position = getDropPosition(event)
 
   emit('drop-task', {
-    task: props.task,
+    targetTask: props.task,
     position,
   })
 }

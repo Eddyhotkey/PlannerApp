@@ -1,149 +1,199 @@
 <script setup>
-import { ref, nextTick, watch } from 'vue'
+import { nextTick, ref, watch, computed } from 'vue'
+import IconEdit from '@/components/icons/IconEdit.vue'
+import IconTrash from '@/components/icons/IconTrash.vue'
 
 const props = defineProps({
-  appointment: Object,
-  appointments: Array,
-  saveAppointment: Function,
-  deleteAppointment: Function,
+  appointment: {
+    type: Object,
+    required: true,
+  },
+  isEditing: {
+    type: Boolean,
+    default: false,
+  },
 })
 
-const isEditing = ref(false)
+const emit = defineEmits([
+  'start-editing',
+  'cancel-editing',
+  'save-appointment',
+  'delete-appointment',
+])
 
-const localStart = ref('')
-const localEnd = ref('')
-const localTitle = ref('')
-
-const startInput = ref(null)
-
-const overlapMessage = ref('')
-const showTimeError = ref(false)
+const titleInputRef = ref(null)
+const localTitle = ref(props.appointment.title)
+const localStart = ref(props.appointment.start)
+const localEnd = ref(props.appointment.end)
+const localError = ref('')
 
 watch(
-  () => props.appointment.isNew,
-  (isNew) => {
-    if (isNew) startEdit()
+  () => props.appointment,
+  (value) => {
+    localTitle.value = value.title
+    localStart.value = value.start
+    localEnd.value = value.end
+  },
+  { deep: true }
+)
+
+watch(
+  () => props.isEditing,
+  async (value) => {
+    if (value) {
+      localTitle.value =
+        props.appointment.title === 'Neuer Termin' ? '' : props.appointment.title
+      localStart.value = props.appointment.start
+      localEnd.value = props.appointment.end
+      localError.value = ''
+
+      await nextTick()
+      titleInputRef.value?.focus()
+      titleInputRef.value?.select()
+    }
   },
   { immediate: true }
 )
 
-function startEdit() {
-  isEditing.value = true
-  overlapMessage.value = ''
-  showTimeError.value = false
-
-  localStart.value = props.appointment.start || ''
-  localEnd.value = props.appointment.end || ''
-  localTitle.value = props.appointment.title || ''
-
-  nextTick(() => startInput.value?.focus())
-}
-
-function saveEdit() {
-  overlapMessage.value = ''
-  showTimeError.value = false
-
-  const s = localStart.value.trim()
-  const e = localEnd.value.trim()
-  const t = localTitle.value.trim()
-
-  if (!s || !e || !t) {
-    if (props.appointment.isNew) {
-      props.deleteAppointment(props.appointment)
-      return
-    }
-    cancelEdit()
-    return
-  }
-
-  if (e <= s) {
-    showTimeError.value = true
-    return
-  }
-
-  const result = props.saveAppointment({
-    id: props.appointment.id,
-    start: s,
-    end: e,
-    title: t,
-  })
-
-  if (result?.error === 'overlap') {
-    const o = result.overlappingAppointment
-    overlapMessage.value = `Überschneidet sich mit: ${o.start}–${o.end} ${o.title}`
-    return
-  }
-
-  isEditing.value = false
-}
+const formattedTime = computed(() => {
+  if (!props.appointment.start || !props.appointment.end) return ''
+  return `${props.appointment.start}–${props.appointment.end}`
+})
 
 function cancelEdit() {
-  overlapMessage.value = ''
-  showTimeError.value = false
+  const isNewAppointment = props.appointment.title === 'Neuer Termin'
 
-  if (props.appointment.isNew) {
-    props.deleteAppointment(props.appointment)
+  if (isNewAppointment) {
+    emit('delete-appointment', props.appointment)
     return
   }
 
-  isEditing.value = false
+  localTitle.value = props.appointment.title
+  localStart.value = props.appointment.start
+  localEnd.value = props.appointment.end
+  localError.value = ''
+  emit('cancel-editing')
 }
 
-function removeAppointment() {
-  props.deleteAppointment(props.appointment)
+async function saveAppointment() {
+  const trimmedTitle = localTitle.value.trim()
+  const isNewAppointment = props.appointment.title === 'Neuer Termin'
+
+  if (!trimmedTitle) {
+    if (isNewAppointment) {
+      emit('delete-appointment', props.appointment)
+    } else {
+      localTitle.value = props.appointment.title
+      emit('cancel-editing')
+    }
+    return
+  }
+
+  if (!localStart.value || !localEnd.value) {
+    localError.value = 'Start- und Endzeit sind erforderlich.'
+    return
+  }
+
+  if (localStart.value >= localEnd.value) {
+    localError.value = 'Die Endzeit muss nach der Startzeit liegen.'
+    return
+  }
+
+  localError.value = ''
+
+  emit('save-appointment', {
+    id: props.appointment.id,
+    title: trimmedTitle,
+    start: localStart.value,
+    end: localEnd.value,
+  })
 }
 </script>
 
 <template>
-  <li class="rounded-xl border bg-white p-4 shadow-sm">
+  <div
+    class="rounded-md border border-neutral-200 bg-neutral-50 dark:bg-neutral-600 dark:border-neutral-500 p-2">
+    <template v-if="isEditing">
+      <div class="space-y-2">
+        <input
+          ref="titleInputRef"
+          v-model="localTitle"
+          type="text"
+          class="w-full rounded-md border border-neutral-300 px-2 py-1 text-sm"
+          placeholder="Termin"
+          @keyup.enter="saveAppointment"
+          @keyup.esc="cancelEdit"
+        />
 
-    <!-- EDIT -->
-    <div v-if="isEditing" class="space-y-2">
-      <input ref="startInput" v-model="localStart" type="time" class="w-full border px-2 py-1 rounded" />
-      <input v-model="localEnd" type="time" class="w-full border px-2 py-1 rounded" />
-      <input v-model="localTitle" placeholder="Titel" class="w-full border px-2 py-1 rounded" />
+        <div class="grid grid-cols-2 gap-2">
+          <input
+            v-model="localStart"
+            type="time"
+            class="rounded-md border border-neutral-300 px-2 py-1 text-sm"
+          />
 
-      <p v-if="showTimeError" class="text-xs text-red-500">
-        Endzeit muss später sein
-      </p>
+          <input
+            v-model="localEnd"
+            type="time"
+            class="rounded-md border border-neutral-300 px-2 py-1 text-sm"
+          />
+        </div>
 
-      <p v-if="overlapMessage" class="text-xs text-red-500">
-        {{ overlapMessage }}
-      </p>
-
-      <div class="flex gap-2">
-        <button @click="saveEdit" class="text-xs bg-black text-white px-2 py-1 rounded">
-          Speichern
-        </button>
-        <button @click="cancelEdit" class="text-xs">
-          Abbrechen
-        </button>
-        <button @click="removeAppointment" class="text-xs text-red-500">
-          Löschen
-        </button>
-      </div>
-    </div>
-
-    <!-- VIEW -->
-    <div v-else class="flex justify-between">
-      <div>
-        <p class="text-sm font-semibold">
-          {{ appointment.start }} – {{ appointment.end }}
+        <p
+          v-if="localError"
+          class="text-sm text-red-600"
+        >
+          {{ localError }}
         </p>
-        <p class="text-sm text-slate-600">
-          {{ appointment.title }}
-        </p>
-      </div>
 
-      <div class="flex gap-2">
-        <button @click="startEdit" class="text-xs">
-          Bearbeiten
-        </button>
-        <button @click="removeAppointment" class="text-xs text-red-500">
-          Löschen
-        </button>
-      </div>
-    </div>
+        <div class="flex gap-2">
+          <button
+            type="button"
+            class="rounded-md border border-neutral-200 bg-neutral-100 cursor-pointer px-3 py-1.5 text-sm text-neutral-700 hover:bg-neutral-300"
+            @click="saveAppointment"
+          >
+            Speichern
+          </button>
 
-  </li>
+          <button
+            type="button"
+            class="rounded-md border border-neutral-200 bg-neutral-100 cursor-pointer px-3 py-1.5 text-sm text-neutral-700 hover:bg-neutral-300"
+            @click="cancelEdit"
+          >
+            Abbrechen
+          </button>
+        </div>
+      </div>
+    </template>
+
+    <template v-else>
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <p class="text-sm font-medium text-neutral-800 dark:text-white">
+            {{ appointment.title }}
+          </p>
+          <p class="text-xs text-neutral-500 dark:text-white">
+            {{ formattedTime }}
+          </p>
+        </div>
+        <div class="flex gap-1">
+          <button
+            type="button"
+            class="rounded-md  py-1 text-xs text-neutral-500 cursor-pointer"
+            @click="$emit('start-editing')"
+          >
+            <IconEdit />
+          </button>
+
+          <button
+            type="button"
+            class="rounded-md py-1 text-xs text-red-600 cursor-pointer"
+            @click="$emit('delete-appointment')"
+          >
+            <IconTrash />
+          </button>
+        </div>
+      </div>
+    </template>
+  </div>
 </template>

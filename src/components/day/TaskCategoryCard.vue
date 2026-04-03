@@ -1,10 +1,13 @@
 <template>
   <section
     :class="[
-      'rounded-xl border bg-slate-50 p-4 transition',
+      'rounded-lg border\n'+
+'        border-neutral-200 dark:border-neutral-600\n'+
+'        bg-white dark:bg-neutral-800\n'+
+'        border-neutral-200 bg-white p-4 shadow-sm transition',
       isDragOver
         ? 'border-blue-400 bg-blue-50 ring-2 ring-blue-200'
-        : 'border-slate-200'
+        : 'border-neutral-200'
     ]"
     @dragenter.prevent="handleDragEnter"
     @dragover.prevent="handleDragOver"
@@ -12,34 +15,39 @@
     @drop="handleDropCategory"
   >
     <div class="mb-4 flex items-center justify-between">
-      <h2 class="text-lg font-semibold text-slate-800">{{ title }}</h2>
+      <h2 class="text-lg font-semibold text-neutral-800 dark:text-neutral-100">{{ title }}</h2>
 
       <button
         type="button"
-        class="rounded-lg bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
+        class="rounded-md border border-neutral-200 bg-neutral-100 cursor-pointer px-3 py-1.5 text-sm text-neutral-700 hover:bg-neutral-300"
         @click="$emit('add-task')"
       >
         + Aufgabe
       </button>
     </div>
+
     <p
       v-if="isDragOver"
       class="mb-3 rounded-md bg-blue-100 px-3 py-2 text-sm text-blue-700"
     >
       Aufgabe hier ablegen
     </p>
+
     <ul class="mb-2 space-y-2">
       <TaskItem
         v-for="task in tasks"
         :key="task.id"
         :task="task"
+        :is-editing="editingTaskId === task.id"
         :is-dragging="draggedTaskId === task.id"
         :is-drop-target="dropTargetTaskId === task.id"
         :drop-position="dropTargetTaskId === task.id ? dropPosition : null"
+        @start-editing="startEditing"
+        @cancel-editing="stopEditing"
         @remove-task="$emit('remove-task', $event)"
         @toggle-completed="$emit('toggle-completed', $event)"
         @move-to-tomorrow="$emit('move-to-tomorrow', $event)"
-        @update-title="$emit('update-title', $event)"
+        @update-title="handleUpdateTitle"
         @update-priority="$emit('update-priority', $event)"
         @drag-start="handleTaskDragStart"
         @drag-end="$emit('drag-end')"
@@ -52,10 +60,10 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import TaskItem from '@/components/day/TaskItem.vue'
 
-defineProps({
+const props = defineProps({
   title: {
     type: String,
     required: true,
@@ -68,8 +76,11 @@ defineProps({
     type: [Number, String, null],
     default: null,
   },
+  lastCreatedTaskId: {
+    type: [Number, null],
+    default: null,
+  },
 })
-
 
 const emit = defineEmits([
   'add-task',
@@ -84,30 +95,59 @@ const emit = defineEmits([
   'drop-category',
 ])
 
-const isDragOver = ref(false);
-const dropTargetTaskId = ref( null );
+const isDragOver = ref(false)
+const dropTargetTaskId = ref(null)
 const dropPosition = ref(null)
+const editingTaskId = ref(null)
 
-function handleDragEnter( ) {
-  isDragOver.value = true;
+watch(
+  [() => props.lastCreatedTaskId, () => props.tasks],
+  ([newId]) => {
+    if (!newId) return
+
+    const existsInThisCategory = props.tasks.some(task => task.id === newId)
+
+    if (existsInThisCategory) {
+      editingTaskId.value = newId
+    }
+  },
+  { immediate: true, deep: true }
+)
+
+function startEditing(task) {
+  editingTaskId.value = task.id
 }
 
-function handleDragOver( ) {
-  isDragOver.value = true;
+function stopEditing() {
+  editingTaskId.value = null
 }
 
-function handleDragLeave ( event ) {
-  const currentTarget = event.currentTarget;
-  const relatedTarget = event.relatedTarget;
+function handleUpdateTitle(payload) {
+  emit('update-title', payload)
+  editingTaskId.value = null
+}
 
-  if ( !currentTarget.contains( relatedTarget ) ) {
-    isDragOver.value = false;
+function handleDragEnter() {
+  isDragOver.value = true
+}
+
+function handleDragOver() {
+  isDragOver.value = true
+}
+
+function handleDragLeave(event) {
+  const currentTarget = event.currentTarget
+  const relatedTarget = event.relatedTarget
+
+  if (!currentTarget.contains(relatedTarget)) {
+    isDragOver.value = false
   }
 }
 
-function handleTaskDragStart ( task ) {
-  emit( 'drag-start', task );
+function handleTaskDragStart(task) {
+  emit('drag-start', task)
 }
+
 function handleTaskDragOver(payload) {
   isDragOver.value = true
   dropTargetTaskId.value = payload.task.id
@@ -124,7 +164,7 @@ function handleTaskDrop(payload) {
   dropTargetTaskId.value = null
   dropPosition.value = null
 
-  emit('drop-task', payload)
+  emit('drop-task', payload.targetTask, payload.position)
 }
 
 function handleDropCategory() {
@@ -133,5 +173,4 @@ function handleDropCategory() {
   dropPosition.value = null
   emit('drop-category')
 }
-
 </script>
